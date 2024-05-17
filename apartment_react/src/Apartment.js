@@ -138,7 +138,7 @@ function Apartment() {
                 </label>
                 <label>
                     床面積:
-                    <input type="number" stap="0.01" name="floorArea" />
+                    <input type="text" pattern="\d+(\.\d+)?" name="floorArea" />
                 </label>
                 <button type="submit">追加</button>
             </form>
