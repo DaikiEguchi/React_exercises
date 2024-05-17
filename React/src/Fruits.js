@@ -8,25 +8,32 @@ function Fruits() {
 
   useEffect(() => {
     console.log("call useEffect START");
-    fetch('http://localhost:8080/fruits').then(response=>{
-      response.json().then(value=>{
+    fetch('http://localhost:8080/fruits').then(response => {
+      response.json().then(value => {
         // ※２
         console.log(value);
         setData(value);
       })
       // catchを入れることで、サーバに接続できなくなったときに画面にエラーを出す代わりにコンソールに出す
     })
-    .catch(error => {
-      console.log(error);
-      setData([]);
-    });
+      .catch(error => {
+        console.log(error);
+        setData([]);
+      });
 
     console.log("call useEffect END");
-    return () => {};
+    return () => { };
   }, []);
 
   const fruitData = data && data.map((item, index) => {
-    return (<tr key={index}><td>{item.id}</td><td>{item.name}</td><td>{item.price}</td><td>{item.stock}</td></tr>);
+    return (
+      <tr key={index}>
+        <td>{item.id}</td>
+        <td>{item.name}</td>
+        <td>{item.price}</td>
+        <td>{item.stock}</td>
+        <td><button type='submit' onClick={() => deleteStock(item)}>削除</button></td>
+      </tr>);
   })
 
   // 在庫情報を追加する関数
@@ -38,31 +45,54 @@ function Fruits() {
       },
       body: JSON.stringify(formData)
     })
-    .then(response => {
-      if (response.ok) {
-        // 在庫情報が正常に追加された場合、フルーツデータを再取得して更新する
-        return fetchFruitData();
-      } else {
-        // エラーメッセージを表示するなどの処理を行う
-        console.error('Failed to add stock');
-      }
+      .then(response => {
+        if (response.ok) {
+          // 在庫情報が正常に追加された場合、フルーツデータを再取得して更新する
+          return fetchFruitData();
+        } else {
+          // エラーメッセージを表示するなどの処理を行う
+          console.error('Failed to add stock');
+        }
+      })
+      .catch(error => {
+        console.error('Error adding stock:', error);
+      });
+  }
+
+  // 在庫情報を削除する関数
+  const deleteStock = (formData) => {
+    fetch('http://localhost:8080/fruits/delete', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(formData)
     })
-    .catch(error => {
-      console.error('Error adding stock:', error);
-    });
+      .then(response => {
+        if (response.ok) {
+          // 在庫情報が正常に追加された場合、フルーツデータを再取得して更新する
+          return fetchFruitData();
+        } else {
+          // エラーメッセージを表示するなどの処理を行う
+          console.error('Failed to delete stock');
+        }
+      })
+      .catch(error => {
+        console.error('Error deleting stock:', error);
+      });
   }
 
   // フルーツデータを再取得する関数
   const fetchFruitData = () => {
     fetch('http://localhost:8080/fruits')
-    .then(response => response.json())
-    .then(data => {
-      setData(data);
-    })
-    .catch(error => {
-      console.error('Error fetching fruit data:', error);
-      setData([]);
-    });
+      .then(response => response.json())
+      .then(data => {
+        setData(data);
+      })
+      .catch(error => {
+        console.error('Error fetching fruit data:', error);
+        setData([]);
+      });
   }
 
   // フォームから送信された際の処理
@@ -87,6 +117,7 @@ function Fruits() {
             <th>商品名</th>
             <th>単価</th>
             <th>在庫数</th>
+            <th>削除</th>
           </tr>
         </thead>
         <tbody>
