@@ -28,11 +28,12 @@ function Apartment() {
                 <td>{item.address}</td>
                 <td>{item.sales}</td>
                 <td>{item.floorArea}</td>
+                <td><button type='submit' onClick={() => updateData(item)}>編集</button></td>
                 <td><button type='submit' onClick={() => deleteData(item)}>削除</button></td>
             </tr>);
     })
 
-    // 在庫情報を追加する関数
+    // 物件情報の追加
     const addData = (formData) => {
         fetch('http://localhost:8080/apartment/add', {
             method: 'POST',
@@ -43,7 +44,7 @@ function Apartment() {
         })
             .then(response => {
                 if (response.ok) {
-                    // 在庫情報が正常に追加された場合、フルーツデータを再取得して更新する
+                    // 物件情報が正常に追加された場合、物件データを再取得して更新する
                     return fetchApartmentData();
                 } else {
                     // エラーメッセージを表示するなどの処理を行う
@@ -55,7 +56,30 @@ function Apartment() {
             });
     }
 
-    // 在庫情報を削除する関数
+    // 物件情報の更新
+    const updateData = (formData) => {
+        fetch('http://localhost:8080/apartment/update', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+            .then(response => {
+                if (response.ok) {
+                    // 物件情報が正常に追加された場合、物件データを再取得して更新する
+                    return fetchApartmentData();
+                } else {
+                    // エラーメッセージを表示するなどの処理を行う
+                    console.error('Failed to update data');
+                }
+            })
+            .catch(error => {
+                console.error('Error updating data:', error);
+            });
+    }
+
+    // 物件情報を削除する関数
     const deleteData = (formData) => {
         fetch('http://localhost:8080/apartment/delete', {
             method: 'POST',
@@ -66,7 +90,7 @@ function Apartment() {
         })
             .then(response => {
                 if (response.ok) {
-                    // 在庫情報が正常に追加された場合、フルーツデータを再取得して更新する
+                    // 物件情報が正常に追加された場合、物件データを再取得して更新する
                     return fetchApartmentData();
                 } else {
                     // エラーメッセージを表示するなどの処理を行う
@@ -78,7 +102,7 @@ function Apartment() {
             });
     }
 
-    // フルーツデータを再取得する関数
+    // 物件データを再取得する関数
     const fetchApartmentData = () => {
         fetch('http://localhost:8080/apartment')
             .then(response => response.json())
@@ -95,11 +119,12 @@ function Apartment() {
     const handleSubmit = (event) => {
         event.preventDefault();
         const formData = new FormData(event.target);
+        console.log("formData: " + formData);
         const newdata = {
             name: formData.get('name'),
-            address: parseInt(formData.get('address')),
-            sales: parseInt(formData.get('sales')),
-            floorArea: parseInt(formData.get('floorArea'))
+            address: formData.get('address'),
+            sales: formData.get('sales'),
+            floorArea: parseFloat(formData.get('floorArea'))
         };
         addData(newdata);
     }
@@ -130,7 +155,7 @@ function Apartment() {
                 </label>
                 <label>
                     住所:
-                    <input type="test" name="price" required />
+                    <input type="test" name="address" required />
                 </label>
                 <label>
                     担当者:
